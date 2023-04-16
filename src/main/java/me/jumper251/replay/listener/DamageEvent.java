@@ -3,6 +3,7 @@ package me.jumper251.replay.listener;
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import me.jumper251.replay.ReplaySystem;
 import me.jumper251.replay.api.ReplayAPI;
+import me.jumper251.replay.replaysystem.data.types.VagtRecording;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -19,7 +20,7 @@ import java.util.Map;
 
 public class DamageEvent extends AbstractListener {
 
-    public static Map<Player, Boolean> recordingPlayers = new HashMap<>();
+    public static Map<Player, VagtRecording> recordingPlayers = new HashMap<>();
     @EventHandler
     public void onDamageEvent(EntityDamageByEntityEvent e) {
 
@@ -28,22 +29,24 @@ public class DamageEvent extends AbstractListener {
         }
         Player player = (Player) e.getEntity();
 
-        if (!player.hasPermission("group.vagt") || player.isOp()) {
+        if (!player.hasPermission("vagt") || player.isOp()) {
+            //Bukkit.broadcastMessage("returner");
             return;
         }
 
-        double absorptionHealth = (player.getMaxHealth() - player.getHealth()) * 2;
-        if(absorptionHealth <= 0) {
+        if(player.getHealth() <= 14) {
             if (recordingPlayers.containsKey(player)) {
                 return;
             }
-            recordingPlayers.put(player, false);
             //Bukkit.broadcastMessage("§8§l[ §6§l➲ §8§l] §fEn vagt blev slået og begynder at record!");
 
             LocalDateTime now = LocalDateTime.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
             String formattedDate = now.format(formatter).replace(" ", "-");
             String name = player.getName() + "-" + formattedDate;
+
+            VagtRecording vagtRecording = new VagtRecording(player, name, true);
+            recordingPlayers.put(player, vagtRecording);
 
             List<Player> toRecord = new ArrayList<>(Bukkit.getOnlinePlayers());
             ReplayAPI.getInstance().recordReplay(name, player, toRecord);
@@ -52,9 +55,14 @@ public class DamageEvent extends AbstractListener {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    ReplayAPI.getInstance().stopReplay(name, recordingPlayers.get(player), true);
-                    //Bukkit.broadcastMessage("§8§l[ §6§l➲ §8§l] §fStoppede med at record for " + player.getName() + "!" + " (" + recordingPlayers.get(player) + ")");
-                    recordingPlayers.remove(player);
+                    if (recordingPlayers.containsKey(player)) {
+                        if (recordingPlayers.get(player).getRecording()) {
+
+                            ReplayAPI.getInstance().stopReplay(name, false, true);
+                            //Bukkit.broadcastMessage("§8§l[ §6§l➲ §8§l] §fStoppede med at record for " + player.getName() + "!" + " (GEMTE IKKE)");
+                            recordingPlayers.remove(player);
+                        }
+                    }
                 }
             }.runTaskLater(ReplaySystem.getInstance(), 1200);
         }

@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -75,41 +76,50 @@ public class Replayer {
 	}
 	
 	
-	public void start() {
+	public void start(String target) {
 		ReplayData data = this.replay.getData();
 		int duration = data.getDuration();
 		this.session.setStart(watcher.getLocation());
-		
-		if (data.getActions().containsKey(0)) {
-			for (ActionData startData : data.getActions().get(0)) {
-				if (startData.getPacketData() instanceof SpawnData) {
-					SpawnData spawnData = (SpawnData) startData.getPacketData();
-					watcher.teleport(LocationData.toLocation(spawnData.getLocation()));
-					break;
-				}
-			}
-		} else {
-			Optional<SpawnData> spawnData = findFirstSpawn(data);
-			if (spawnData.isPresent()) watcher.teleport(LocationData.toLocation(spawnData.get().getLocation()));
-		}
-		
-		
+
+		//if (data.getActions().containsKey(0)) {
+			//for (ActionData startData : data.getActions().get(0)) {
+				//if (startData.getPacketData() instanceof SpawnData) {
+					//SpawnData spawnData = (SpawnData) startData.getPacketData();
+					//watcher.teleport(LocationData.toLocation(spawnData.getLocation()));
+					//break;
+				//}
+			//}
+		//} else {
+			//Optional<SpawnData> spawnData = findFirstSpawn(data);
+			//if (spawnData.isPresent()) watcher.teleport(LocationData.toLocation(spawnData.get().getLocation()));
+		//}
+
+
 		this.session.startSession();
-		
+
 		this.speed = 1;
-		
+
 		executeTick(0, false);
-		
+
+		try {
+			if (this.getNPCList().containsKey(target)) {
+				INPC npc = this.getNPCList().get(target);
+				//Bukkit.broadcastMessage(String.valueOf(npc.getLocation()));
+				watcher.teleport(npc.getLocation());
+			}
+		} catch (Exception ignored) { }
+
+
 		this.run = new BukkitRunnable() {
-			
+
 			@Override
 			public void run() {
-				
+
 				if (Replayer.this.paused) return;
-				
+
 				Replayer.this.tmpTicks += speed;
 				if (Replayer.this.tmpTicks % 1 != 0) return;
-				
+
 				if (currentTicks < duration) {
 
 					executeTick(currentTicks++, false);
@@ -118,19 +128,19 @@ public class Replayer {
 						executeTick(currentTicks++, false);
 
 					}
-					
+
 					updateXPBar();
 				} else {
-					
+
 					stop();
 				}
 			}
 		};
-		
+
 		this.run.runTaskTimerAsynchronously(ReplaySystem.getInstance(), 1, 1);
-		
+
 	}
-	
+
 	public void executeTick(int tick, boolean reversed) {
 		ReplayData data = this.replay.getData();
 		if (!data.getActions().isEmpty() && data.getActions().containsKey(tick)) {
@@ -140,9 +150,9 @@ public class Replayer {
 
 			List<ActionData> list = data.getActions().get(tick);
 			for (ActionData action : list) {
-								
+
 				utils.handleAction(action, data, reversed);
-				
+
 				if (action.getType() == ActionType.CUSTOM) {
 					if (ReplayAPI.getInstance().getHookManager().isRegistered()) {
 						for (IReplayHook hook : ReplayAPI.getInstance().getHookManager().getHooks()) {
@@ -150,13 +160,13 @@ public class Replayer {
 						}
 					}
 				}
-			
+
 			}
-			
+
 			if (tick == 0) data.getActions().remove(tick);
 		}
 	}
-	
+
 	private void updateXPBar() {
 		int level = currentTicks / 20;
 		float percentage = (float) currentTicks / this.replay.getData().getDuration();
@@ -164,7 +174,7 @@ public class Replayer {
 		this.watcher.setLevel(level);
 		this.watcher.setExp(percentage);
 	}
-	
+
 	private Optional<SpawnData> findFirstSpawn(ReplayData data) {
 		return data.getActions().values().stream()
 				.flatMap(Collection::stream)
@@ -172,11 +182,15 @@ public class Replayer {
 				.map(action -> (SpawnData) action.getPacketData())
 				.findFirst();
 	}
-	
+
 	public void stop() {
 		sendMessage("Replay finished.");
-		
-		this.run.cancel();
+
+		try {
+			this.run.cancel();
+		} catch (Exception ignored) { }
+
+
 		this.getReplay().getData().getActions().clear();
 		
 		for (INPC npc : this.npcs.values()) {

@@ -74,7 +74,9 @@ public class ReplayHelper {
 			meta.setDisplayName("§6" + name);
 			meta.setOwner(name);
 			stack.setItemMeta(meta);
-			
+
+			System.out.print("INDEX: " + index);
+			System.out.print("ITEMSTACK: " + stack);
 			inv.setItem(index, stack);
 
 			index++;

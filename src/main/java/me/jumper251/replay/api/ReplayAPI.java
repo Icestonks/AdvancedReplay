@@ -84,7 +84,8 @@ public class ReplayAPI {
 				
 				@Override
 				public void accept(Replay replay) {
-					replay.play(watcher);
+					String[] nameSplit = name.split("-");
+					replay.play(watcher, nameSplit[0]);
 					
 				}
 			});

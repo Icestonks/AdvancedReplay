@@ -6,6 +6,7 @@ package me.jumper251.replay.commands.replay;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import me.jumper251.replay.replaysystem.utils.entities.INPC;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -28,20 +29,22 @@ public class ReplayPlayCommand extends SubCommand {
 	@Override
 	public boolean execute(CommandSender cs, Command cmd, String label, String[] args) {
 		if (args.length != 2) return false;
-		
+
 		String name = args[1];
-		
-		final Player p = (Player)cs;	
-		
+
+		final Player p = (Player)cs;
+
 		if (ReplaySaver.exists(name) && !ReplayHelper.replaySessions.containsKey(p.getName())) {
 			p.sendMessage(ReplaySystem.PREFIX + "Loading replay §e" + name + "§7...");
 			try {
 				ReplaySaver.load(args[1], new Consumer<Replay>() {
-					
+
 					@Override
 					public void accept(Replay replay) {
 						p.sendMessage(ReplaySystem.PREFIX + "Replay loaded. Duration §e" + (replay.getData().getDuration() / 20) + "§7 seconds.");
-						replay.play(p);
+						String[] name_split = name.split("-");
+						replay.play(p, name_split[0]);
+
 					}
 				});
 

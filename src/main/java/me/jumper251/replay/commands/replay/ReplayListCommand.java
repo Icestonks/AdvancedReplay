@@ -32,44 +32,44 @@ import net.md_5.bungee.api.chat.HoverEvent.Action;
 public class ReplayListCommand extends SubCommand {
 
 	public ReplayListCommand(AbstractCommand parent) {
-		super(parent, "list", "Lists all replays", "list [Page]", false);
+		super(parent, "list", "Liste af alle replays", "list [Page]", false);
 	}
 
 	@Override
 	public boolean execute(CommandSender cs, Command cmd, String label, String[] args) {
 		if (args.length > 2) return false;
 
-		
+
 		if (ReplaySaver.getReplays().size() > 0) {
 			int page = 1;
 			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
 			if (args.length == 2 && MathUtils.isInt(args[1])) page = Integer.valueOf(args[1]);
-			
+
 
 			List<String> replays = ReplaySaver.getReplays();
 			replays.sort(dateComparator());
-			
+
 			CommandPagination<String> pagination = new CommandPagination<>(replays, 9);
-			cs.sendMessage(ReplaySystem.PREFIX + "Available replays: §8(§6" + ReplaySaver.getReplays().size() + "§8) §7| Page: §e" + page + "§7/§e" + pagination.getPages());
+			cs.sendMessage(ReplaySystem.PREFIX + "Tilgængelige replays: §8(§6" + ReplaySaver.getReplays().size() + "§8) §7| Side: §e" + page + "§7/§e" + pagination.getPages());
 
 			pagination.printPage(page, new IPaginationExecutor<String>() {
 
 				@Override
 				public void print(String element) {
-					String message = String.format(" §6§o%s    §e%s", (getCreationDate(element) != null ? format.format(getCreationDate(element)) : ""), element);
+					String message = String.format(" §7§o%s §8» §f%s", (getCreationDate(element) != null ? format.format(getCreationDate(element)) : ""), element);
 					if (cs instanceof Player) {
 						BaseComponent[] comps;
 						if (DatabaseReplaySaver.getInfo(element) != null && DatabaseReplaySaver.getInfo(element).getCreator() != null) {
 							ReplayInfo info = DatabaseReplaySaver.getInfo(element);
 
 							comps = new ComponentBuilder(message)
-									.event(new HoverEvent(Action.SHOW_TEXT, new ComponentBuilder("§7Replay §e§l" + info.getID() + "\n\n§7Created by: §6" + info.getCreator() + "\n§7Duration: §6" + (info.getDuration() / 20) + " §8sec" + "\n\n§7Click to play!").create()))
+									.event(new HoverEvent(Action.SHOW_TEXT, new ComponentBuilder("§7Replay §e§l" + info.getID() + "\n\n§7Oprettet af: §6" + info.getCreator() + "\n§7Varighed: §6" + (info.getDuration() / 20) + " §8sek" + "\n\n§7Klik for at afspille!").create()))
 									.event(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/replay play " + info.getID()))
 									.create();
 						} else {
 							comps = new ComponentBuilder(message)
-									.event(new HoverEvent(Action.SHOW_TEXT, new ComponentBuilder("§7Replay §e§l" + element + "\n\n§7Click to play!").create()))
+									.event(new HoverEvent(Action.SHOW_TEXT, new ComponentBuilder("§7Replay §e§l" + element + "\n\n§7Klik for at afspille!").create()))
 									.event(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/replay play " + element))
 									.create();
 						}
@@ -77,26 +77,26 @@ public class ReplayListCommand extends SubCommand {
 					} else {
 						cs.sendMessage(message);
 					}
-					
+
 				}
 			});
-						
-			
+
+
 		} else {
-			cs.sendMessage(ReplaySystem.PREFIX + "§cNo replays found.");
+			cs.sendMessage(ReplaySystem.PREFIX + "§cIngen replays fundet.");
 		}
 		return true;
 	}
-	
+
 	private Date getCreationDate(String replay) {
 		if (ReplaySaver.replaySaver instanceof DefaultReplaySaver) {
 			return new Date(new File(DefaultReplaySaver.DIR, replay + ".replay").lastModified());
 		}
-		
+
 		if (ReplaySaver.replaySaver instanceof DatabaseReplaySaver) {
 			return new Date(DatabaseReplaySaver.replayCache.get(replay).getTime());
 		}
-		
+
 		return null;
 	}
 	

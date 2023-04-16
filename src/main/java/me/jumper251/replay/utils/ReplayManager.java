@@ -2,6 +2,8 @@ package me.jumper251.replay.utils;
 
 import java.util.HashMap;
 
+import me.jumper251.replay.listener.DamageEvent;
+import me.jumper251.replay.listener.DeathEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -27,6 +29,8 @@ public class ReplayManager {
 	
 	private static void registerEvents() {
 		new ReplayListener().register();
+		new DamageEvent().register();
+		new DeathEvent().register();
 	}
 	
 	private static void registerCommands() {

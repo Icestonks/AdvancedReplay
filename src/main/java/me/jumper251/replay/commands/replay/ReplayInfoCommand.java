@@ -27,49 +27,49 @@ import net.md_5.bungee.api.chat.HoverEvent.Action;
 public class ReplayInfoCommand extends SubCommand {
 
 	public ReplayInfoCommand(AbstractCommand parent) {
-		super(parent, "info", "Information about a Replay", "info <Name>", false);
+		super(parent, "info", "Information om en genafspilning", "info <navn>", false);
 	}
 
 	@Override
 	public boolean execute(CommandSender cs, Command cmd, String label, String[] args) {
 		if (args.length != 2) return false;
-		
-		String name = args[1];
-		
 
-		if (ReplaySaver.exists(name)) {
-			cs.sendMessage(ReplaySystem.PREFIX + "Loading replay §e" + name + "§7...");
+		String navn = args[1];
 
 
-			ReplaySaver.load(name, replay -> {
-				ReplayInfo info = replay.getReplayInfo() != null ? replay.getReplayInfo() : new ReplayInfo(replay.getId(), replay.getData().getCreator(), null, replay.getData().getDuration());
-				ReplayStats stats = ReplayOptimizer.analyzeReplay(replay);				
-				
-				cs.sendMessage("§c» §7Information about §e§l" + replay.getId() + " §c«");
+		if (ReplaySaver.exists(navn)) {
+			cs.sendMessage(ReplaySystem.PREFIX + "Indlæser genafspilning §e" + navn + "§7...");
+
+
+			ReplaySaver.load(navn, genafspilning -> {
+				ReplayInfo info = genafspilning.getReplayInfo() != null ? genafspilning.getReplayInfo() : new ReplayInfo(genafspilning.getId(), genafspilning.getData().getCreator(), null, genafspilning.getData().getDuration());
+				ReplayStats stats = ReplayOptimizer.analyzeReplay(genafspilning);
+
+				cs.sendMessage("§c» §7Information om §e§l" + genafspilning.getId() + " §c«");
 				cs.sendMessage("");
 				if (info.getCreator() != null) {
-					cs.sendMessage("§7§oCreated by: §9" + info.getCreator());
+					cs.sendMessage("§7§oOprettet af: §9" + info.getCreator());
 				}
 
-				cs.sendMessage("§7§oDuration: §6" + (info.getDuration() / 20) + " §7§oseconds");
-				cs.sendMessage("§7§oPlayers: §6" + stats.getPlayers().stream().collect(Collectors.joining("§7, §6")));
-				cs.sendMessage("§7§oQuality: " + (replay.getData().getQuality() != null ? replay.getData().getQuality().getQualityName() : ReplayQuality.HIGH.getQualityName()));
+				cs.sendMessage("§7§oVarighed: §6" + (info.getDuration() / 20) + " §7§osekunder");
+				cs.sendMessage("§7§oSpillere: §6" + stats.getPlayers().stream().collect(Collectors.joining("§7, §6")));
+				cs.sendMessage("§7§oKvalitet: " + (genafspilning.getData().getQuality() != null ? genafspilning.getData().getQuality().getQualityName() : ReplayQuality.HIGH.getQualityName()));
 
 				if (cs instanceof Player) {
 					((Player)cs).spigot().sendMessage(buildMessage(stats));
 				}
 				if (stats.getEntityCount() > 0) {
-					cs.sendMessage("§7§oEntities: §6" + stats.getEntityCount());
+					cs.sendMessage("§7§oEntiteter: §6" + stats.getEntityCount());
 				}
 
-				
-				
+
+
 			});
-			
+
 		} else {
-			cs.sendMessage(ReplaySystem.PREFIX + "§cReplay not found.");
+			cs.sendMessage(ReplaySystem.PREFIX + "§cGenafspilning ikke fundet.");
 		}
-		
+
 		return true;
 	}
 	

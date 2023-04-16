@@ -22,13 +22,13 @@ import me.jumper251.replay.utils.ReplayManager;
 public class ReplayStopCommand extends SubCommand {
 
 	public ReplayStopCommand(AbstractCommand parent) {
-		super(parent, "stop", "Stops and saves a replay", "stop <Name> [Options]", false);
+		super(parent, "stop", "Stopper og gemmer et replay", "stop <Navn> [Muligheder]", false);
 	}
 
 	@Override
 	public boolean execute(CommandSender cs, Command cmd, String label, String[] args) {
 		if (args.length > 3 || args.length < 2) return false;
-		
+
 		String name = args[1];
 		boolean isForce = args.length == 3 && args[2].equals("-force");
 		boolean isNoSave = args.length == 3 && args[2].equals("-nosave");
@@ -39,35 +39,37 @@ public class ReplayStopCommand extends SubCommand {
 			if (isNoSave || replay.getRecorder().getData().getActions().size() == 0) {
 				replay.getRecorder().stop(false);
 
-				cs.sendMessage(ReplaySystem.PREFIX + "§7Successfully stopped replay §e" + name);
+				cs.sendMessage(ReplaySystem.PREFIX + "§7Replayet §e" + name + "§7 blev stoppet succesfuldt.");
 			} else {
 				if (ReplaySaver.exists(name) && !isForce) {
-					cs.sendMessage(ReplaySystem.PREFIX + "§cReplay already exists. Use §o-force §r§cto overwrite or §o-nosave §r§cto discard the recording.");
+					cs.sendMessage(ReplaySystem.PREFIX + "§cReplayet eksisterer allerede. Brug §o-force §r§cfor at overskrive eller §o-nosave §r§cfor at slette optagelsen.");
 					return true;
 				}
-				
-				cs.sendMessage(ReplaySystem.PREFIX + "Saving replay §e" + name + "§7...");
+
+				cs.sendMessage(ReplaySystem.PREFIX + "Gemmer replayet §e" + name + "§7...");
 				replay.getRecorder().stop(true);
-			
+
 				String path = ReplaySaver.replaySaver instanceof DefaultReplaySaver ? ReplaySystem.getInstance().getDataFolder() + "/replays/" + name + ".replay" : null;
-				cs.sendMessage(ReplaySystem.PREFIX + "§7Successfully saved replay" + (path != null ? " to §o" + path : ""));
+				cs.sendMessage(ReplaySystem.PREFIX + "§7Replayet blev gemt succesfuldt" + (path != null ? " til §o" + path : ""));
 			}
-			
+
 		} else {
-			cs.sendMessage(ReplaySystem.PREFIX + "§cReplay not found.");
+			cs.sendMessage(ReplaySystem.PREFIX + "§cReplayet blev ikke fundet.");
 		}
-		
+
 		return true;
 	}
-	
+
 	@Override
 	public List<String> onTab(CommandSender cs, Command cmd, String label, String[] args) {
 		if (args.length == 3) return Arrays.asList("-nosave", "-force");
-		
+
 		return ReplayManager.activeReplays.keySet().stream()
 				.filter(name -> StringUtil.startsWithIgnoreCase(name, args.length > 1 ? args[1] : null))
 				.collect(Collectors.toList());
 	}
 
-	
+
+
+
 }

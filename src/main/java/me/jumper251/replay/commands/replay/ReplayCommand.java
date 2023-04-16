@@ -8,16 +8,16 @@ import me.jumper251.replay.commands.SubCommand;
 public class ReplayCommand extends AbstractCommand {
 
 	public ReplayCommand() {
-		super("Replay", ReplaySystem.PREFIX + "AdvancedReplay §ev" + ReplaySystem.getInstance().getDescription().getVersion(), "replay.command");
+		super("Replay", ReplaySystem.PREFIX + " §fv" + ReplaySystem.getInstance().getDescription().getVersion(), "replay.command");
 	}
 
 	@Override
 	protected MessageFormat setupFormat() {
 		return new MessageFormat()
-				.overview("§6/{command} {args} §7 - {desc}")
-				.syntax(ReplaySystem.PREFIX + "Usage: §6/{command} {args}")
-				.permission(ReplaySystem.PREFIX + "§cInsufficient permissions")
-				.notFound(ReplaySystem.PREFIX + "§7Command not found.");
+				.overview("§8▍ §7/{command} §f{args} §7 - §f{desc}")
+				.syntax(ReplaySystem.PREFIX + "\n&8▍ §7Usage: §f/{command} {args}")
+				.permission(ReplaySystem.PREFIX + "§CDette har du ikke permission til")
+				.notFound(ReplaySystem.PREFIX + "§7Kommando blev ikke fundet!");
 	}
 
 	@Override

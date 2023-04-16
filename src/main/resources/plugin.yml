@@ -6,4 +6,4 @@ depend: [ProtocolLib]
 commands:
   replay:
     description: Main Replay command
-    aliases: [rp]
+    aliases: [rp, vagt-replay]

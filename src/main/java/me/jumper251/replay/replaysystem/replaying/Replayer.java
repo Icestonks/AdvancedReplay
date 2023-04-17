@@ -77,23 +77,10 @@ public class Replayer {
 	
 	
 	public void start(String target) {
+
 		ReplayData data = this.replay.getData();
 		int duration = data.getDuration();
 		this.session.setStart(watcher.getLocation());
-
-		//if (data.getActions().containsKey(0)) {
-			//for (ActionData startData : data.getActions().get(0)) {
-				//if (startData.getPacketData() instanceof SpawnData) {
-					//SpawnData spawnData = (SpawnData) startData.getPacketData();
-					//watcher.teleport(LocationData.toLocation(spawnData.getLocation()));
-					//break;
-				//}
-			//}
-		//} else {
-			//Optional<SpawnData> spawnData = findFirstSpawn(data);
-			//if (spawnData.isPresent()) watcher.teleport(LocationData.toLocation(spawnData.get().getLocation()));
-		//}
-
 
 		this.session.startSession();
 

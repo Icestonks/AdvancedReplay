@@ -54,7 +54,7 @@ public class ReplayPlayCommand extends SubCommand {
 				p.sendMessage(ReplaySystem.PREFIX + "§cError while loading §o" + name + ".replay. §r§cCheck console for more details.");
 			}
 		} else {
-			p.sendMessage(ReplaySystem.PREFIX + "§cReplay not found.");
+			p.sendMessage(ReplaySystem.PREFIX + "§cReplay not found. §7(prøv: /replay leave -force)");
 		}
 		
 		return true;

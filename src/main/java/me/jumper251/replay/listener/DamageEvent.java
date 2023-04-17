@@ -62,9 +62,12 @@ public class DamageEvent extends AbstractListener {
                             //Bukkit.broadcastMessage("§8§l[ §6§l➲ §8§l] §fStoppede med at record for " + player.getName() + "!" + " (GEMTE IKKE)");
                             recordingPlayers.remove(player);
                         }
+                        else {
+                            recordingPlayers.remove(player);
+                        }
                     }
                 }
-            }.runTaskLater(ReplaySystem.getInstance(), 1200);
+            }.runTaskLaterAsynchronously(ReplaySystem.getInstance(), 1200);
         }
     }
 }

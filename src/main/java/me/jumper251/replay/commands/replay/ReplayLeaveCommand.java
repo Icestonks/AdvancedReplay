@@ -3,6 +3,7 @@ package me.jumper251.replay.commands.replay;
 
 
 
+import me.jumper251.replay.listener.DamageEvent;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -36,6 +37,7 @@ public class ReplayLeaveCommand extends SubCommand {
 		if(Arrays.asList(args).contains("-delete")) {
 			p.sendMessage("delete");
 			ReplayHelper.replaySessions.clear();
+			DamageEvent.recordingPlayers.clear();
 			return true;
 		}
 
